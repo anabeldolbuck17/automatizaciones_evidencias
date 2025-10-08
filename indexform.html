@@ -3,149 +3,115 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Automatización de Evidencias - Google Drive</title>
+  <title>Automatizador de Evidencias - SoA</title>
   <style>
     body {
-      font-family: "Inter", sans-serif;
-      background: #f3f4f6;
-      margin: 0;
-      padding: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: #f5f6fa;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       height: 100vh;
+      margin: 0;
     }
-
     .container {
-      background: white;
+      background: #fff;
+      padding: 30px;
       border-radius: 16px;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-      padding: 40px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      width: 90%;
       max-width: 500px;
-      width: 100%;
     }
-
     h1 {
       text-align: center;
-      color: #1e293b;
-      margin-bottom: 20px;
-      font-size: 1.5rem;
+      color: #2c3e50;
     }
-
     label {
       display: block;
-      font-weight: 600;
-      color: #334155;
       margin-top: 15px;
+      font-weight: 600;
+      color: #34495e;
     }
-
-    input[type="text"] {
+    input {
       width: 100%;
-      padding: 12px;
-      margin-top: 6px;
-      border: 1px solid #cbd5e1;
+      padding: 10px;
       border-radius: 8px;
-      font-size: 1rem;
-      transition: all 0.2s ease;
+      border: 1px solid #ccc;
+      margin-top: 5px;
+      font-size: 15px;
     }
-
-    input[type="text"]:focus {
-      outline: none;
-      border-color: #2563eb;
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
-    }
-
     button {
       margin-top: 25px;
       width: 100%;
-      background-color: #2563eb;
+      padding: 12px;
+      background-color: #4a90e2;
       color: white;
+      font-size: 16px;
       border: none;
-      padding: 14px;
-      font-size: 1rem;
       border-radius: 8px;
       cursor: pointer;
-      transition: background 0.2s ease;
+      transition: background-color 0.3s ease;
     }
-
     button:hover {
-      background-color: #1d4ed8;
+      background-color: #357ABD;
     }
-
-    .success,
-    .error {
-      text-align: center;
+    .response {
       margin-top: 20px;
-      font-weight: 600;
-    }
-
-    .success {
-      color: #16a34a;
-    }
-
-    .error {
-      color: #dc2626;
+      padding: 10px;
+      border-radius: 8px;
+      background: #eafaf1;
+      border: 1px solid #2ecc71;
+      color: #27ae60;
+      display: none;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Automatizar Evidencias</h1>
+    <h1>Automatizador de Evidencias</h1>
 
-    <form id="automationForm">
-      <label for="excelLink">🔗 Enlace del documento Excel (SoA):</label>
-      <input type="text" id="excelLink" name="excelLink" placeholder="Pega aquí el enlace de Google Sheets" required />
+    <form id="autoForm">
+      <label for="excelLink">🔗 Enlace del Excel (SoA)</label>
+      <input type="url" id="excelLink" name="excelLink" placeholder="https://docs.google.com/spreadsheets/..." required>
 
-      <label for="driveLink">📂 Enlace de la carpeta con documentos:</label>
-      <input type="text" id="driveLink" name="driveLink" placeholder="Pega aquí el enlace de la carpeta de Drive" required />
+      <label for="driveLink">📁 Enlace de la carpeta en Drive</label>
+      <input type="url" id="driveLink" name="driveLink" placeholder="https://drive.google.com/drive/folders/..." required>
 
-      <label for="sheetName">📄 Nombre de la hoja (opcional):</label>
-      <input type="text" id="sheetName" name="sheetName" placeholder="Ej: SoA, Normas, Datos..." />
+      <label for="sheetName">📄 Nombre de la hoja</label>
+      <input type="text" id="sheetName" name="sheetName" placeholder="SoA actualizado" required>
 
       <button type="submit">🚀 Ejecutar Automatización</button>
     </form>
 
-    <div id="responseMessage"></div>
+    <div id="response" class="response"></div>
   </div>
 
   <script>
-    const form = document.getElementById("automationForm");
-    const messageBox = document.getElementById("responseMessage");
-
-    form.addEventListener("submit", async (e) => {
+    document.getElementById("autoForm").addEventListener("submit", async (e) => {
       e.preventDefault();
+      const excelLink = document.getElementById("excelLink").value;
+      const driveLink = document.getElementById("driveLink").value;
+      const sheetName = document.getElementById("sheetName").value;
 
-      const excelLink = document.getElementById("excelLink").value.trim();
-      const driveLink = document.getElementById("driveLink").value.trim();
-      const sheetName = document.getElementById("sheetName").value.trim();
-
-      messageBox.textContent = "Enviando datos...";
-      messageBox.className = "";
+      const responseBox = document.getElementById("response");
+      responseBox.style.display = "block";
+      responseBox.innerText = "⏳ Ejecutando flujo, por favor espera...";
 
       try {
-        // 🔗 Cambia esta URL por la de tu Webhook de n8n
-        const webhookUrl = "https://ps01-n8n.k2oxnb.easypanel.host/webhook/1b7258e1-3a82-4faa-a9f5-ae0b5142aae0";
-
-        const response = await fetch(webhookUrl, {
+        const res = await fetch("https://ps01-n8n.k2oxnb.easypanel.host/webhook/1b7258e1-3a82-4faa-a9f5-ae0b5142aae0", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ excelLink, driveLink, sheetName }),
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ excelLink, driveLink, sheetName })
         });
 
-        const result = await response.json();
-        if (response.ok) {
-          messageBox.textContent = "✅ Automatización ejecutada correctamente.";
-          messageBox.className = "success";
-        } else {
-          messageBox.textContent = "❌ Error: " + (result.error || "No se pudo ejecutar el flujo.");
-          messageBox.className = "error";
-        }
+        const data = await res.json();
+        responseBox.innerText = "✅ " + (data.message || "Flujo completado correctamente.");
       } catch (err) {
-        console.error(err);
-        messageBox.textContent = "❌ Error de conexión con el servidor.";
-        messageBox.className = "error";
+        responseBox.style.background = "#fdecea";
+        responseBox.style.borderColor = "#e74c3c";
+        responseBox.style.color = "#c0392b";
+        responseBox.innerText = "❌ Error ejecutando el flujo: " + err.message;
       }
     });
   </script>
