@@ -99,7 +99,7 @@
       responseBox.innerText = "⏳ Ejecutando flujo, por favor espera...";
 
       try {
-        const res = await fetch("https://ps01-n8n.k2oxnb.easypanel.host/webhook/1b7258e1-3a82-4faa-a9f5-ae0b5142aae0", {
+        const res = await fetch("https://ps01-n8n.k2oxnb.easypanel.host/webhook/auto-evidencias", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ excelLink, driveLink, sheetName })
@@ -117,4 +117,5 @@
   </script>
 </body>
 </html>
+
 
