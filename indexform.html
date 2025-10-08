@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Automatización de Evidencias - Google Drive</title>
+  <style>
+    body {
+      font-family: "Inter", sans-serif;
+      background: #f3f4f6;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .container {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+      padding: 40px;
+      max-width: 500px;
+      width: 100%;
+    }
+
+    h1 {
+      text-align: center;
+      color: #1e293b;
+      margin-bottom: 20px;
+      font-size: 1.5rem;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      color: #334155;
+      margin-top: 15px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      margin-top: 6px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: all 0.2s ease;
+    }
+
+    input[type="text"]:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+    }
+
+    button {
+      margin-top: 25px;
+      width: 100%;
+      background-color: #2563eb;
+      color: white;
+      border: none;
+      padding: 14px;
+      font-size: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    button:hover {
+      background-color: #1d4ed8;
+    }
+
+    .success,
+    .error {
+      text-align: center;
+      margin-top: 20px;
+      font-weight: 600;
+    }
+
+    .success {
+      color: #16a34a;
+    }
+
+    .error {
+      color: #dc2626;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Automatizar Evidencias</h1>
+
+    <form id="automationForm">
+      <label for="excelLink">🔗 Enlace del documento Excel (SoA):</label>
+      <input type="text" id="excelLink" name="excelLink" placeholder="Pega aquí el enlace de Google Sheets" required />
+
+      <label for="driveLink">📂 Enlace de la carpeta con documentos:</label>
+      <input type="text" id="driveLink" name="driveLink" placeholder="Pega aquí el enlace de la carpeta de Drive" required />
+
+      <label for="sheetName">📄 Nombre de la hoja (opcional):</label>
+      <input type="text" id="sheetName" name="sheetName" placeholder="Ej: SoA, Normas, Datos..." />
+
+      <button type="submit">🚀 Ejecutar Automatización</button>
+    </form>
+
+    <div id="responseMessage"></div>
+  </div>
+
+  <script>
+    const form = document.getElementById("automationForm");
+    const messageBox = document.getElementById("responseMessage");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const excelLink = document.getElementById("excelLink").value.trim();
+      const driveLink = document.getElementById("driveLink").value.trim();
+      const sheetName = document.getElementById("sheetName").value.trim();
+
+      messageBox.textContent = "Enviando datos...";
+      messageBox.className = "";
+
+      try {
+        // 🔗 Cambia esta URL por la de tu Webhook de n8n
+        const webhookUrl = "https://TU_N8N_URL/webhook/automatizar-evidencias";
+
+        const response = await fetch(webhookUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ excelLink, driveLink, sheetName }),
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+          messageBox.textContent = "✅ Automatización ejecutada correctamente.";
+          messageBox.className = "success";
+        } else {
+          messageBox.textContent = "❌ Error: " + (result.error || "No se pudo ejecutar el flujo.");
+          messageBox.className = "error";
+        }
+      } catch (err) {
+        console.error(err);
+        messageBox.textContent = "❌ Error de conexión con el servidor.";
+        messageBox.className = "error";
+      }
+    });
+  </script>
+</body>
+</html>
